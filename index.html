@@ -1,0 +1,1224 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Flashcard App - Create, organize, and study your flashcards effortlessly. Perfect for students, educators, and professionals to enhance learning.">
+    <meta name="keywords" content="flashcards, study tool, learning app, create flashcards, educational tool">
+    <meta name="author" content="Rohit kumar">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Flashcard App">
+    <meta property="og:description"
+        content="Flashcard App - The ultimate tool for creating, organizing, and studying flashcards. Boost your learning today.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://simpleflashcard.tiiny.site/">
+    <meta property="og:image" content="https://yourwebsite.com/flashcard-preview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Flashcard App">
+    <meta name="twitter:description"
+        content="Flashcard App - The ultimate tool for creating, organizing, and studying flashcards. Boost your learning today.">
+    <meta name="twitter:image" content="https://yourwebsite.com/flashcard-preview.png">
+    <title>Flashcard App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --secondary-color: #fff;
+            --background-color: #f4f4f9;
+            --text-color: #333;
+            --tag-text-color: #212121;
+            --header-text-color: #4caf50;
+            --easy-color: #8bc34a;
+            --normal-color: #ff9800;
+            --hard-color: #f44336;
+            --neon-easy-color: #00ff00;
+            --neon-normal-color: #ffff00;
+            --neon-hard-color: #ff0000;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #333;
+            --secondary-color: #444;
+            --background-color: #121212;
+            --text-color: #ddd;
+            --tag-text-color: #121212;
+            --header-text-color: #ddd;
+            --neon-easy-color: #00ff00;
+            --neon-normal-color: #ffff00;
+            --neon-hard-color: #ff0000;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #6200ea;
+            color: white;
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: top 0.3s ease;
+        }
+
+        header.hidden {
+            top: -90px;
+        }
+
+        header input,
+        header select,
+        header button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        header button {
+            background-color: #03dac6;
+            color: #000;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #toggle-header-btn {
+            position: fixed;
+            bottom: 69px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        header button:hover {
+            background-color: #018786;
+        }
+
+        header .delete-folder-button {
+            background-color: #ff1744;
+            color: white;
+        }
+
+        header .delete-folder-button:hover {
+            background-color: #d50000;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .card-actions i {
+            font-size: 16px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .card-actions i:hover {
+            color: var(--primary-color);
+        }
+
+
+        #flashcards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .flashcard {
+            position: relative;
+            width: 200px;
+            min-height: 290px;
+            /* Set a minimum height */
+            perspective: 1000px;
+            cursor: pointer;
+            margin: 15px;
+            transition: transform 0.3s ease;
+            border: 3px solid;
+            border-radius: 8px;
+            box-shadow: 0 0 10px, 0 0 20px;
+            overflow: visible;
+            /* Ensure content isn't clipped */
+
+        }
+
+        .flashcard[data-difficulty="easy"] {
+            border-color: var(--neon-easy-color);
+            box-shadow: 0 0 10px var(--neon-easy-color), 0 0 20px var(--neon-easy-color);
+        }
+
+        .flashcard[data-difficulty="normal"] {
+            border-color: var(--neon-normal-color);
+            box-shadow: 0 0 10px var(--neon-normal-color), 0 0 20px var(--neon-normal-color);
+        }
+
+        .flashcard[data-difficulty="hard"] {
+            border-color: var(--neon-hard-color);
+            box-shadow: 0 0 10px var(--neon-hard-color), 0 0 20px var(--neon-hard-color);
+        }
+
+        .flashcard:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .flashcard.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        .card-front {
+            background: var(--secondary-color);
+            color: var(--text-color);
+
+        }
+
+        .card-back {
+            background: var(--primary-color);
+            color: var(--text-color);
+            transform: rotateY(180deg);
+
+        }
+
+        .tags {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 12px;
+            background: #eee;
+            border-radius: 3px;
+            padding: 2px 5px;
+            color: var(--tag-text-color);
+        }
+
+        .difficulty-icons {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .difficulty-icons .icon {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .icon.easy {
+            background-color: var(--easy-color);
+        }
+
+        .icon.normal {
+            background-color: var(--normal-color);
+        }
+
+        .icon.hard {
+            background-color: var(--hard-color);
+        }
+
+
+
+
+
+
+
+
+        /* General Mobile Styles */
+        @media (max-width: 768px) {
+
+
+            #flashcards {
+                display: flex;
+                flex-direction: column;
+                /* Stack flashcards vertically */
+                gap: 15px;
+                width: 100%;
+                /* Ensure full-width usage */
+                align-items: center;
+                /* Center flashcards */
+            }
+
+            .flashcard {
+                width: 90%;
+                /* Occupy 90% of screen width */
+                height: 40vh;
+                /* Allow height to adjust based on content */
+                margin: 10px 0;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                border: 2px solid var(--primary-color);
+            }
+
+            .card-front,
+            .card-back {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .tags {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .tag {
+                padding: 2px 5px;
+                font-size: 12px;
+            }
+
+            .difficulty-icons {
+                bottom: 10px;
+                right: 10px;
+                gap: 5px;
+            }
+
+            .difficulty-icons .icon {
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+            }
+        }
+
+        /* Tablet Styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+
+
+
+
+            #flashcards {
+                display: flex;
+                flex-wrap: wrap;
+                /* Allow cards to wrap into rows */
+                gap: 15px;
+                justify-content: center;
+                /* Center flashcards */
+                width: 100%;
+            }
+
+            .flashcard {
+                flex: 1 1 calc(45% - 20px);
+                /* Use 45% width for each flashcard */
+                max-width: 300px;
+                /* Prevent flashcards from getting too wide */
+                height: 100px;
+                margin: 10px;
+                box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .card-front,
+            .card-back {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .tags {
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .tag {
+                padding: 3px 7px;
+                font-size: 14px;
+            }
+
+            .difficulty-icons {
+                bottom: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+
+            .difficulty-icons .icon {
+                width: 22px;
+                height: 22px;
+                font-size: 14px;
+            }
+        }
+
+        /* Large Screen Styles for Reference */
+        @media (max-width: 600px) {
+            header {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            header.hidden {
+                top: -200px;
+            }
+
+
+        }
+        
+
+        #difficultyFilter {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #difficultyFilter:focus {
+            border-color: var(--header-text-color);
+            box-shadow: 0 0 5px var(--header-text-color);
+        }
+
+        #difficultyFilter option {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        /* Hover effect for the dropdown */
+        #difficultyFilter:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+        }
+        #folderActions {
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid var(--primary-color);
+    border-radius: 5px;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#folderActions:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2,
+.modal-content h3 {
+    color: var(--header-text-color);
+}
+
+.modal-content ul {
+    text-align: left;
+    margin: 20px;
+    padding-left: 40px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+#aboutLink {
+    font-size: 16px;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 600;
+    background-color: var(--background-color);
+
+}
+
+#aboutLink:hover {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    box-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color);
+}
+
+#aboutLink:active {
+    transform: scale(0.98);
+}
+
+
+    </style>
+
+</head>
+
+<body>
+    <header>
+        <input type="text" id="searchTag" placeholder="Search by tag" oninput="searchByTag()" />
+        <select id="folderSelect" onchange="selectFolder()">
+            <option value="" disabled selected>Select a folder</option>
+        </select>
+
+        <select id="folderActions" onchange="handleFolderAction(this.value)">
+            <option value="" selected disabled>Folder Actions</option>
+            <option value="createFolder">Create Folder</option>
+            <option value="addFlashcard">Create Flashcard</option>
+            <option value="toggleTheme">Toggle Theme</option>
+            <option value="uploadJSON">Upload JSON</option>
+            <option value="uploadDataJSON">Upload Data</option>
+            <option value="downloadAllData">Download Data</option>
+            <option value="syncChanges">Sync Changes</option>
+            <option value="shuffleDisplay">Shuffle Display</option>
+
+
+        </select>
+        <!-- <a href="#about" id="aboutLink" onclick="showAbout()">@more</a> -->
+
+        <input type="file" id="jsonFileInputUpload" style="display: none;" accept=".json"
+            onchange="handleFileUpload(event)">
+        <input type="file" id="jsonFileInputRestore" style="display: none;" accept=".json"
+            onchange="restoreData(event)">
+
+        <select id="difficultyFilter" onchange="filterFlashcards()">
+            <option value="" selected>All</option>
+            <option value="easy">Easy</option>
+            <option value="normal">Normal</option>
+            <option value="hard">Hard</option>
+        </select>
+        <!-- <a href="javascript:void(0)" id="userAuthLink" onclick="toggleAuthModal()">Register/Login</a> -->
+        <span id="loggedInUser" style="display: none;">
+            : <span id="loggedInUsername"></span>
+            <button id="logoutButton" onclick="logout()">Logout</button>
+        </span>
+        <div id="controls">
+            <select id="flashcardSubset" onchange="resetAndDisplaySubset()">
+                <option value="" selected>Show All</option>
+                <option value="5">Show 5 Flashcards</option>
+                <option value="10">Show 10 Flashcards</option>
+            </select>
+            <button id="previousButton" onclick="changeSubsetPage(-1)" disabled>Previous</button>
+            <button id="nextButton" onclick="changeSubsetPage(1)" disabled>Next</button>
+        </div>
+        
+        
+    </header>
+    <!-- About Modal -->
+     
+    <div id="aboutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeAbout()">&times;</span>
+            <h2>About the App</h2>
+            <p>This app was created by Rohit Kumar to help users organize and study efficiently with flashcards.</p>
+            <h3>How to Use</h3>
+            <ul>
+                <li>Select or create a folder to organize your flashcards.</li>
+                <li>Create flashcards with questions, answers, and tags.</li>
+                <li>Use the filter dropdown to view flashcards based on difficulty.</li>
+                <li>Download or upload data to manage your flashcards easily.</li>
+                <li>Upload Json structure.</li>
+
+                <pre>
+[
+{
+    "question": "2^2?",
+    "answer": "4.",
+    "tags": ["SSC"]
+},
+{
+    "question": "3^2?",
+    "answer": "9.",
+    "tags": ["Maths"]
+}
+]</pre>
+
+            </ul>
+        </div>
+    </div>
+
+
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleAuthModal()">&times;</span>
+            <h2 id="authModalTitle">Register</h2>
+            <form id="authForm">
+                <input type="text" id="authUsername" placeholder="Username" required>
+                <input type="password" id="authPassword" placeholder="Password" required>
+                <button type="button" onclick="handleAuth()">Submit</button>
+            </form>
+            <p id="authToggleText">
+                Already have an account? <a href="javascript:void(0)" onclick="switchAuthMode()">Login</a>
+            </p>
+        </div>
+    </div>
+
+
+    <div id="flashcards"></div>
+    <button id="toggle-header-btn" onclick="toggleHeaderVisibility()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+
+    <script>
+let currentPage = 0; // Tracks the current page
+let currentSubsetSize = 0; // Tracks the selected subset size
+let currentFilteredFlashcards = []; // Tracks filtered flashcards
+
+
+
+
+function setDifficulty(index, difficulty, event) {
+    event.stopPropagation(); // Prevent the card from flipping when setting difficulty
+
+    // Map the displayed (subset) index back to the original folder index
+    const start = currentPage * currentSubsetSize; // Start index of the current page
+    const originalIndex = folders[currentFolder].findIndex(
+        card => card.question === currentFilteredFlashcards[start + index].question
+    );
+
+    if (originalIndex !== -1) {
+        // Update the difficulty in the original dataset
+        folders[currentFolder][originalIndex].difficulty = difficulty;
+        saveToLocalStorage();
+
+        // Update the difficulty in the filtered flashcards
+        currentFilteredFlashcards[start + index].difficulty = difficulty;
+
+        // Redisplay the current subset to reflect the updated difficulty
+        displayCurrentSubset();
+    } else {
+        console.error("Unable to locate original flashcard for updating difficulty.");
+    }
+}
+
+
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+
+function displaySubset() {
+    if (!currentFolder) {
+        alert("Please select a folder first!");
+        return;
+    }
+
+    const subsetSize = parseInt(document.getElementById("flashcardSubset").value, 10);
+    const selectedDifficulty = document.getElementById("difficultyFilter").value;
+    const flashcards = folders[currentFolder];
+
+    if (!flashcards || flashcards.length === 0) {
+        alert("No flashcards available in the selected folder.");
+        return;
+    }
+
+    // Filter flashcards by difficulty
+    currentFilteredFlashcards = flashcards.filter(card =>
+        !selectedDifficulty || card.difficulty === selectedDifficulty
+    );
+
+    // Shuffle the filtered flashcards
+    // currentFilteredFlashcards = shuffleArray(currentFilteredFlashcards);
+
+    // Determine the subset size to display
+    currentSubsetSize = subsetSize || currentFilteredFlashcards.length;
+
+    // Reset to the first page
+    currentPage = 0;
+    updatePaginationControls();
+    displayCurrentSubset();
+}
+
+function displayCurrentSubset() {
+    const start = currentPage * currentSubsetSize;
+    const end = Math.min(start + currentSubsetSize, currentFilteredFlashcards.length);
+
+    const subsetFlashcards = currentFilteredFlashcards.slice(start, end);
+    displayFlashcards(subsetFlashcards);
+
+    updatePaginationControls();
+}
+
+function changeSubsetPage(direction) {
+    const totalPages = Math.ceil(currentFilteredFlashcards.length / currentSubsetSize);
+
+    currentPage += direction;
+
+    // Ensure the current page stays within bounds
+    if (currentPage < 0) currentPage = 0;
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+
+    displayCurrentSubset();
+}
+
+function updatePaginationControls() {
+    const totalPages = Math.ceil(currentFilteredFlashcards.length / currentSubsetSize);
+
+    document.getElementById("previousButton").disabled = currentPage === 0; // Disable "Previous" if on the first page
+    document.getElementById("nextButton").disabled = currentPage >= totalPages - 1; // Disable "Next" if on the last page
+}
+
+
+function updatePaginationControls() {
+    const totalPages = Math.ceil(currentFilteredFlashcards.length / currentSubsetSize);
+
+    document.getElementById("previousButton").disabled = currentPage === 0;
+    document.getElementById("nextButton").disabled = currentPage >= totalPages - 1;
+}
+
+function resetAndDisplaySubset() {
+    currentPage = 0; // Reset to the first page
+    displaySubset();
+}
+function shuffleDisplay() {
+    displaySubset(); // Shuffle and display filtered cards
+}
+
+
+
+
+
+        function showAbout() {
+    document.getElementById("aboutModal").style.display = "block";
+}
+
+function closeAbout() {
+    document.getElementById("aboutModal").style.display = "none";
+}
+
+// Close modal if user clicks outside the modal content
+window.onclick = function (event) {
+    const modal = document.getElementById("aboutModal");
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+};
+function handleFolderAction(action) {
+    switch (action) {
+        case "createFolder":
+            createFolder();
+            break;
+        case "addFlashcard":
+            addFlashcard();
+            break;
+        case "toggleTheme":
+            toggleTheme();
+            break;
+        case "uploadJSON":
+            document.getElementById("jsonFileInputUpload").click();
+            break;
+        case "uploadDataJSON":
+            document.getElementById("jsonFileInputRestore").click();
+            break;
+        case "downloadAllData":
+            downloadAllData();
+            break;
+        case "shuffleDisplay":
+            shuffleDisplay();
+            break;
+        default:
+            console.error("Invalid action selected:", action);
+    }
+    document.getElementById("folderActions").value = ""; // Reset dropdown
+}
+
+
+
+
+
+
+
+
+
+
+
+
+        let folders = JSON.parse(localStorage.getItem("folders")) || {};
+        let currentFolder = "";
+
+        function saveToLocalStorage() {
+            localStorage.setItem("folders", JSON.stringify(folders));
+            updateFolderSelect();
+        }
+
+        function createFolder() {
+            const folderName = prompt("Enter folder name:").trim();
+            if (folderName && !folders[folderName]) {
+                folders[folderName] = [];
+                saveToLocalStorage();
+                updateFolderSelect();
+            } else if (folders[folderName]) {
+                alert("Folder already exists!");
+            } else {
+                alert("Folder name cannot be empty!");
+            }
+        }
+
+        function updateFolderSelect() {
+            const folderSelect = document.getElementById("folderSelect");
+            folderSelect.innerHTML = `<option value="" disabled selected>Select a folder</option>`;
+            Object.keys(folders).forEach(folder => {
+                const cardCount = folders[folder].length;
+                const option = document.createElement("option");
+                option.value = folder;
+                option.textContent = `${folder} (${cardCount})`;
+                folderSelect.appendChild(option);
+            });
+        }
+
+        function selectFolder() {
+    currentFolder = document.getElementById("folderSelect").value;
+
+    // Reset the difficulty filter and subset size to "All"
+    document.getElementById("difficultyFilter").value = "";
+    document.getElementById("flashcardSubset").value = "";
+
+    // Display all flashcards for the selected folder
+    filterFlashcards();
+}
+
+        function addFlashcard() {
+            if (!currentFolder) {
+                alert("Please select a folder first!");
+                return;
+            }
+            const question = prompt("Enter question:").trim();
+            const answer = prompt("Enter answer:").trim();
+            const tags = prompt("Enter tags (comma-separated):").trim();
+            if (question && answer) {
+                folders[currentFolder].push({
+                    question,
+                    answer,
+                    tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
+                    difficulty: "normal" // Default difficulty level
+                });
+                saveToLocalStorage();
+                displayFlashcards();
+            } else {
+                alert("Question and Answer cannot be empty!");
+            }
+        }
+
+        // Function to download all folder and flashcard data as a JSON file
+        function downloadAllData() {
+            const dataStr = JSON.stringify(folders, null, 2);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "flashcard_data.json"; // File name for download
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Function to restore data from uploaded JSON file
+        // Function to handle file uploads and add flashcards to the current folder
+        function handleFileUpload(event) {
+            const file = event.target.files[0]; // Get the uploaded file
+            if (!file) {
+                alert("No file selected.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = JSON.parse(e.target.result); // Parse the JSON file
+
+                    if (!currentFolder) {
+                        alert("Please select a folder before uploading flashcards.");
+                        return;
+                    }
+
+                    if (Array.isArray(data)) {
+                        data.forEach(flashcard => {
+                            if (flashcard.question && flashcard.answer) {
+                                folders[currentFolder].push({
+                                    question: flashcard.question.trim(),
+                                    answer: flashcard.answer.trim(),
+                                    tags: Array.isArray(flashcard.tags) ? flashcard.tags.map(tag => tag.trim()) : [],
+                                });
+                            } else {
+                                console.warn("Skipped invalid flashcard entry:", flashcard);
+                            }
+                        });
+
+                        saveToLocalStorage();
+                        displayFlashcards();
+                        alert("Flashcards uploaded successfully!");
+                    } else {
+                        alert("Invalid file format: Expected an array of flashcards.");
+                    }
+                } catch (error) {
+                    console.error("Error reading JSON file:", error);
+                    alert("Error processing file: Please ensure it's a valid JSON format.");
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Function to restore all data (folders and flashcards) from a JSON file
+        function restoreData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (typeof importedData === "object") {
+                        folders = importedData;
+                        saveToLocalStorage();
+                        updateFolderSelect();
+                        displayFlashcards();
+                        alert("Data restored successfully!");
+                    } else {
+                        alert("Invalid data format!");
+                    }
+                } catch (error) {
+                    alert("Error parsing JSON file. Please check the file format.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+
+        function uploadJSON() {
+            document.getElementById("jsonFileInputUpload").click();
+        }
+
+        function uploadDataJSON() {
+            document.getElementById("jsonFileInputRestore").click();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        function displayFlashcards(flashcardsToDisplay = null) {
+    const flashcardsDiv = document.getElementById("flashcards");
+    flashcardsDiv.innerHTML = "";
+
+    if (!currentFolder || !folders[currentFolder]) return;
+
+    const flashcards = flashcardsToDisplay || folders[currentFolder];
+
+    flashcards.forEach((card, index) => {
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "flashcard";
+        cardDiv.setAttribute("data-difficulty", card.difficulty);
+
+        cardDiv.innerHTML = `
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-actions">
+                        <i class="fas fa-edit" title="Edit" onclick="editFlashcard(${index}, event)"></i>
+                        <i class="fas fa-trash" title="Delete" onclick="deleteFlashcard(${index}, event)"></i>
+                    </div>
+                    <p>${card.question}</p>
+                    <div class="tags">${card.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+                    <div class="difficulty-icons">
+                        <div class="icon easy" onclick="setDifficulty(${index}, 'easy', event)">E</div>
+                        <div class="icon normal" onclick="setDifficulty(${index}, 'normal', event)">N</div>
+                        <div class="icon hard" onclick="setDifficulty(${index}, 'hard', event)">H</div>
+                    </div>
+                </div>
+                <div class="card-back">
+                    <p>${card.answer}</p>
+                </div>
+            </div>
+        `;
+
+        cardDiv.querySelector(".card-inner").addEventListener("click", () => {
+            cardDiv.classList.toggle("flipped");
+        });
+
+        flashcardsDiv.appendChild(cardDiv);
+    });
+}
+
+        function editFlashcard(index, event) {
+            event.stopPropagation(); // Prevent card flipping when editing
+            const card = folders[currentFolder][index];
+            const newQuestion = prompt("Edit question:", card.question);
+            const newAnswer = prompt("Edit answer:", card.answer);
+            const newTags = prompt("Edit tags (comma-separated):", card.tags.join(", "));
+
+            if (newQuestion !== null && newAnswer !== null) {
+                card.question = newQuestion.trim();
+                card.answer = newAnswer.trim();
+                card.tags = newTags ? newTags.split(",").map(tag => tag.trim()) : [];
+                saveToLocalStorage();
+                displayFlashcards();
+            }
+        }
+
+        function deleteFlashcard(index, event) {
+            event.stopPropagation(); // Prevent card flipping when deleting
+            if (confirm("Are you sure you want to delete this flashcard?")) {
+                folders[currentFolder].splice(index, 1);
+                saveToLocalStorage();
+                displayFlashcards();
+            }
+        }
+
+      
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            document.body.setAttribute("data-theme", newTheme);
+        }
+
+
+        function searchByTag() {
+            const searchTag = document.getElementById("searchTag").value.trim().toLowerCase();
+            const flashcardsDiv = document.getElementById("flashcards");
+            flashcardsDiv.innerHTML = "";
+
+            if (!currentFolder || !folders[currentFolder]) return;
+
+            folders[currentFolder]
+                .filter(card => card.tags.some(tag => tag.toLowerCase().includes(searchTag)))
+                .forEach((card, index) => {
+                    const cardDiv = document.createElement("div");
+                    cardDiv.className = "flashcard";
+                    cardDiv.setAttribute("data-difficulty", card.difficulty);
+
+                    cardDiv.innerHTML = `
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <p>${card.question}</p>
+                                <div class="tags">${card.tags.map(tag => `<span class="tag">${tag}</span>`).join("")}</div>
+                                <div class="difficulty-icons">
+                                    <div class="icon easy" onclick="setDifficulty(${index}, 'easy', event)">E</div>
+                                    <div class="icon normal" onclick="setDifficulty(${index}, 'normal', event)">N</div>
+                                    <div class="icon hard" onclick="setDifficulty(${index}, 'hard', event)">H</div>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <p>${card.answer}</p>
+                            </div>
+                        </div>
+                    `;
+
+                    cardDiv.querySelector(".card-inner").addEventListener("click", () => {
+                        cardDiv.classList.toggle("flipped");
+                    });
+
+                    flashcardsDiv.appendChild(cardDiv);
+                });
+        }
+
+        document.addEventListener("DOMContentLoaded", updateFolderSelect);
+
+
+
+
+
+
+
+
+
+
+
+        // Function to delete a folder and its contents
+        function deleteFolder(folderName) {
+            if (folders[folderName]) {
+                if (confirm(`Are you sure you want to delete the folder "${folderName}" and all its contents?`)) {
+                    delete folders[folderName];
+                    saveToLocalStorage();
+                    updateFolderSelect();
+                    if (currentFolder === folderName) {
+                        currentFolder = "";
+                        displayFlashcards();
+                    }
+                    alert(`Folder "${folderName}" has been deleted.`);
+                }
+            } else {
+                alert("Folder not found.");
+            }
+        }
+
+        // Function to display a delete folder icon
+        function displayDeleteFolderIcon() {
+            const header = document.querySelector("header");
+            const deleteIconContainer = document.createElement("div");
+            deleteIconContainer.className = "delete-folder-container";
+            deleteIconContainer.style.display = "inline-block";
+
+            const deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "🗑️ Folder";
+            deleteButton.className = "delete-folder-button";
+            deleteButton.onclick = () => {
+                if (currentFolder) {
+                    deleteFolder(currentFolder);
+                } else {
+                    alert("No folder selected to delete.");
+                }
+            };
+
+            deleteIconContainer.appendChild(deleteButton);
+            header.appendChild(deleteIconContainer);
+        }
+
+        // Update folder select on DOM load and add delete folder button
+        document.addEventListener("DOMContentLoaded", () => {
+            updateFolderSelect();
+            displayDeleteFolderIcon();
+        });
+
+
+
+
+
+
+
+
+
+        let previousScrollPosition = window.pageYOffset;
+        const header = document.querySelector('header');
+        const toggleButton = document.getElementById('toggle-header-btn');
+        let headerVisible = true;
+
+        // Scroll detection to show/hide header
+        let scrollThreshold = 700; // Minimum pixels to scroll up to show the header
+        let hiddenPosition = 0; // Track the position where the header was hidden
+
+        // Scroll detection to show/hide header
+
+
+
+        // Toggle header visibility manually
+        function toggleHeaderVisibility() {
+            headerVisible = !headerVisible;
+            if (headerVisible) {
+                header.classList.remove('hidden');
+            } else {
+                header.classList.add('hidden');
+            }
+        }
+
+        function filterFlashcards() {
+    displaySubset(); // Apply filter and display cards
+}
+function selectFolder() {
+            currentFolder = document.getElementById("folderSelect").value;
+
+            // Reset the difficulty filter to "All"
+            document.getElementById("difficultyFilter").value = "";
+
+            // Display all flashcards for the selected folder
+            filterFlashcards();
+        }
+
+
+
+    </script>
+</body>
+
+</html>
